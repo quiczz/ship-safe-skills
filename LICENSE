@@ -1,12 +1,6 @@
 MIT License
 
-Copyright (c) 2026 The contributors to ship-safe-skills
-
-This license covers the files in this repository that were written for it:
-install.py, skills.json, README.md, and everything under skills/.
-
-It does NOT cover third-party skills that install.py downloads from other authors'
-repositories. Those remain under their own licenses; see THIRD_PARTY.md.
+Copyright (c) 2026 quiczz
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
