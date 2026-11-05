@@ -1,0 +1,96 @@
+# Real output of: python3 skills/zero-trust-review/scripts/zt_scan.py ./my-app
+# Run on a small test project with deliberately planted problems (not a real app).
+
+# Zero Trust evidence scan: `./my-app`
+
+Files scanned: 6  |  Surfaces found: terraform_or_cloudformation, kubernetes, docker, ci
+
+> Evidence = good signs matched by pattern. Risks = bad patterns matched. 'No evidence in repo' means ask the owner, not 'fail'.
+
+| # | Principle | Result | Evidence | Risks |
+|---|-----------|--------|:-:|:-:|
+| 1 | Verify every request | NO EVIDENCE IN REPO | 0 | 0 |
+| 2 | Strong identity | RISKS FOUND | 0 | 2 |
+| 3 | MFA everywhere | NO EVIDENCE IN REPO | 0 | 0 |
+| 4 | Device health | NO EVIDENCE IN REPO | 0 | 0 |
+| 5 | Least privilege (JEA) | RISKS FOUND | 0 | 4 |
+| 6 | Just-in-time access | NO EVIDENCE IN REPO | 0 | 0 |
+| 7 | Microsegmentation | RISKS FOUND | 1 | 4 |
+| 8 | Encrypt internally | RISKS FOUND | 0 | 3 |
+| 9 | Continuous checks | RISKS FOUND | 0 | 1 |
+| 10 | Log everything | RISKS FOUND | 1 | 1 |
+| 11 | Assume breach | RISKS FOUND | 0 | 3 |
+| 12 | Service identity | RISKS FOUND | 0 | 1 |
+
+## 1. Verify every request
+
+- nothing matched
+- ask the owner: Is there a gateway/policy layer that authorizes each request, and does it apply to internal traffic too?
+
+## 2. Strong identity
+
+- ! [medium] long-lived IAM access key resource (1x): main.tf:4
+- ! [medium] AWS keys from CI secrets instead of OIDC federation (1x): .github/workflows/ci.yml:8
+- ask the owner: Which identity provider is the source of truth? Are there shared or local accounts left?
+
+## 3. MFA everywhere
+
+- nothing matched
+- ask the owner: Is MFA enforced in the IdP for ALL users (admins first), and are phishing-resistant methods (passkeys, FIDO2) offered?
+
+## 4. Device health
+
+- nothing matched
+- ask the owner: Is there an MDM/EDR posture check (Intune, Jamf, Kandji, CrowdStrike) feeding access decisions?
+
+## 5. Least privilege (JEA)
+
+- ! [high] wildcard IAM action (1x): main.tf:2
+- ! [high] wildcard IAM resource with allow (1x): main.tf:2
+- ! [medium] container runs as root / privileged (2x): Dockerfile:3, docker-compose.yml:8
+- ! [medium] CI workflow with write-all or no minimal permissions (1x): .github/workflows/ci.yml:1
+- ask the owner: Are cloud IAM roles reviewed? Any wildcard or owner/admin roles in the console that are not in code?
+
+## 6. Just-in-time access
+
+- nothing matched
+- ask the owner: How do admins get elevated rights (PIM, Teleport, break-glass, approval flow)? Do grants expire?
+
+## 7. Microsegmentation
+
+- + network policies / segmentation: `main.tf:1`
+- ! [high] datastore port published to the host/internet (1x): docker-compose.yml:5
+- ! [high] ingress open to the whole internet (1x): main.tf:1
+- ! [high] 1 Kubernetes workload(s) but no NetworkPolicy: all pods can talk to all pods (1x): kubernetes manifests
+- ! [medium] host networking (1x): docker-compose.yml:7
+- ask the owner: Are there VPC/subnet/security-group and cluster network policies beyond what is in this repo?
+
+## 8. Encrypt internally
+
+- ! [high] TLS verification disabled (1x): app.js:1
+- ! [high] storage/database encryption disabled (1x): main.tf:3
+- ! [high] public storage bucket / ACL (1x): main.tf:5
+- ask the owner: Is internal traffic (service to service, DB, cache, queue) TLS/mTLS? Are disks, DBs and backups encrypted with managed keys?
+
+## 9. Continuous checks
+
+- ! [medium] very long token/session lifetime (1x): app.js:1
+- ask the owner: Are sessions, tokens and access re-evaluated on risk changes, and can access be revoked in real time?
+
+## 10. Log everything
+
+- + audit logging / SIEM: `main.tf:6`
+- ! [high] logging/auditing explicitly disabled (1x): main.tf:6
+- ask the owner: Where do audit logs go (SIEM)? Are they immutable, retained, and alerted on? Is anything NOT logged?
+
+## 11. Assume breach
+
+- ! [high] secrets baked into images / compose / manifests (1x): Dockerfile:2
+- ! [medium] container image uses mutable 'latest' tag (2x): Dockerfile:1, docker-compose.yml:3
+- ! [medium] unpinned third-party CI actions (supply-chain) (1x): .github/workflows/ci.yml:5
+- ask the owner: Is there an incident plan, tested restore, isolated backups, and a way to contain a compromised host/agent quickly?
+
+## 12. Service identity
+
+- ! [medium] Kubernetes workloads but no dedicated ServiceAccount defined: they use the namespace default (1x): kubernetes manifests
+- ask the owner: Does every service and automation/agent have its own identity and credentials with its own audit trail?

@@ -1,0 +1,82 @@
+/* Skeletonizer - shared styles. Copy into your global CSS or import once.
+   Mirror mode:  <span class="sk" style="width:120px;height:16px"></span>
+   Overlay mode: <div data-loading="true"> <h2 class="sk-o">Placeholder</h2> </div>
+   Keep it calm: one slow animation, none under reduced motion. */
+
+:root {
+  --sk-base: #e5e7eb;
+  --sk-highlight: #f3f4f6;
+  --sk-radius: 6px;
+  --sk-speed: 1.5s;
+  --sk-show-after: 200ms; /* .sk-delayed appears only if loading lasts longer than this */
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --sk-base: #2a2d34; --sk-highlight: #363a43; }
+}
+:root[data-theme="dark"] { --sk-base: #2a2d34; --sk-highlight: #363a43; }
+
+/* ---------- Mirror mode: standalone placeholder blocks ---------- */
+.sk {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--sk-base);
+  border-radius: var(--sk-radius);
+  min-height: 1em;
+}
+.sk::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--sk-highlight), transparent);
+  animation: sk-shimmer var(--sk-speed) ease-in-out infinite;
+}
+.sk-circle { border-radius: 50%; }
+.sk-inline { display: inline-block; vertical-align: middle; }
+@keyframes sk-shimmer { to { transform: translateX(100%); } }
+
+/* ---------- Overlay mode: the real element is painted over while loading ----------
+   Put .sk-o on block elements (headings, paragraphs, wrappers around images).
+   Children are hidden, so wrap an <img> in an element and put .sk-o on the wrapper.
+   Use placeholder text of a similar length so layout does not move, and set
+   aria-hidden="true" on .sk-o elements while loading. */
+[data-loading="true"] .sk-o {
+  color: transparent !important;
+  text-shadow: none !important;
+  border-color: transparent !important;
+  background: linear-gradient(90deg, var(--sk-base) 25%, var(--sk-highlight) 50%, var(--sk-base) 75%) 0 0 / 200% 100%;
+  animation: sk-bg var(--sk-speed) linear infinite;
+  pointer-events: none;
+  user-select: none;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+[data-loading="true"] .sk-o > * { visibility: hidden; }
+/* default corner radius with zero specificity, so your own border-radius (a round avatar) still wins */
+:where([data-loading="true"] .sk-o) { border-radius: var(--sk-radius); }
+@keyframes sk-bg { to { background-position: -200% 0; } }
+
+/* ---------- Avoid flashes on fast loads (CSS only) ---------- */
+.sk-delayed {
+  opacity: 0;
+  animation: sk-appear 0s linear var(--sk-show-after) forwards;
+}
+@keyframes sk-appear { to { opacity: 1; } }
+
+/* ---------- Screen-reader text for the loading region ---------- */
+.sk-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk::after { animation: none; display: none; }
+  [data-loading="true"] .sk-o { animation: none; background: var(--sk-base); }
+  .sk-delayed { animation-duration: 0s; }
+}

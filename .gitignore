@@ -1,0 +1,11 @@
+.DS_Store
+__pycache__/
+*.pyc
+.env
+.env.*
+.claude/journal/
+node_modules/
+
+# build output
+dist/
+.skillpack-installed.json

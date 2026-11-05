@@ -1,0 +1,46 @@
+# Real output of: python3 skills/api-security-guard/scripts/api_inventory.py ./my-app
+# Run on a small test project with deliberately planted problems (not a real app).
+
+# API inventory: `./my-app`
+
+> Heuristic leads. Verify by reading the code. 'none seen' means no auth pattern was matched near the route, not that none exists.
+
+## Summary
+
+- Endpoints found: **8**
+- No authentication seen (excluding login/health/webhook-style paths): **3**
+- Routes with an object-ID parameter (each needs an ownership check): **4**
+- Unversioned routes: **3**; versions seen: v1, v2  (several versions live: is there a retirement plan?)
+- OpenAPI/Swagger files: openapi.yaml
+- In code but not in spec (6): `/api/v2/items/{}`, `/export`, `/health`, `/internal/debug/dump`, `/v1/login`, `/v1/orders/{}`
+- In spec but not in code (1): `/v1/legacy/ping`
+
+Global signals (found anywhere in non-test code):
+
+- Rate limiting: **not found**
+- HTTPS/HSTS enforcement: **not found**
+- Input validation library: **not found**
+- Deprecation / versioning policy wording: **not found**
+- Logging of auth failures: **not found**
+
+## Findings
+
+| Severity | Issue | Where |
+|---|---|---|
+| high | Credential or token passed in the URL query string (leaks into logs, history, referrers) | `src/server.js:9` |
+| medium | Plain http:// URL used for a non-local endpoint | `src/server.js:11` |
+| medium | Token lifetime looks long (days or more): prefer minutes for access tokens plus refresh tokens | `src/server.js:10` |
+| low | A whole object/record is returned directly: confirm only needed fields are sent | `src/server.js:9` |
+
+## Endpoint inventory
+
+| Method | Path | Auth | Version | Object ID | Public? | Where |
+|---|---|---|---|:-:|:-:|---|
+| GET | `/api/v2/items/[id]` | yes | v2 | yes |  | `app/api/v2/items/[id]/route.ts:1` |
+| GET | `/export` | none seen | none |  |  | `src/server.js:9` |
+| GET | `/health` | none seen | none |  | yes | `src/server.js:3` |
+| GET | `/internal/debug/dump` | none seen | none |  |  | `src/server.js:8` |
+| POST | `/v1/login` | none seen | v1 |  | yes | `src/server.js:4` |
+| DELETE | `/v1/orders/:orderId` | yes | v1 | yes |  | `src/server.js:7` |
+| GET | `/v1/orders/:orderId` | none seen | v1 | yes |  | `src/server.js:6` |
+| GET | `/v1/users/:id` | yes | v1 | yes |  | `src/server.js:5` |

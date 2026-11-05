@@ -1,0 +1,109 @@
+# Prometheus alert rules - adapt metric and label names to your exporters.
+# Assumes: http_requests_total{status,job}, http_request_duration_seconds_bucket{job},
+# node exporter, and a custom gauge backup_last_success_timestamp_seconds.
+groups:
+  - name: app-availability
+    rules:
+      - alert: InstanceDown
+        expr: up{job="app"} == 0
+        for: 2m
+        labels: {severity: page}
+        annotations:
+          summary: "{{ $labels.instance }} is down"
+          runbook: "https://example.invalid/runbooks/instance-down"
+
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{job="app",status=~"5.."}[5m]))
+            / sum(rate(http_requests_total{job="app"}[5m])) > 0.02
+        for: 5m
+        labels: {severity: page}
+        annotations:
+          summary: "5xx rate {{ $value | humanizePercentage }} (threshold 2%)"
+          runbook: "https://example.invalid/runbooks/high-error-rate"
+
+      - alert: HighLatencyP95
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{job="app"}[5m]))) > 2
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: "p95 latency {{ $value }}s"
+          runbook: "https://example.invalid/runbooks/high-latency"
+
+  - name: abuse-and-limits
+    rules:
+      - alert: RateLimitSpike
+        expr: |
+          sum(rate(http_requests_total{job="app",status="429"}[10m]))
+            / sum(rate(http_requests_total{job="app"}[10m])) > 0.05
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: "More than 5% of requests are rate limited"
+
+      - alert: FailedLoginSpike
+        expr: sum(rate(auth_login_failures_total[10m])) > 10 * sum(rate(auth_login_failures_total[1d] offset 1d))
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: "Failed logins are 10x the usual rate"
+
+  - name: api-security
+    # Metrics: auth_failures_total{reason}, authz_denied_total{route}, http_requests_total{route,status,version}.
+    # Keep labels low-cardinality (no user IDs, IPs or raw URLs). Per-IP / per-user detections (credential
+    # stuffing, object probing) need log queries: see skills/api-security-guard/references/monitoring.md.
+    rules:
+      - alert: AuthFailureSpike
+        expr: sum(rate(auth_failures_total[10m])) > 10 * sum(rate(auth_failures_total[1d] offset 1d))
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: "401/auth failures are 10x the usual rate"
+          runbook: "https://example.invalid/runbooks/auth-failure-spike"
+
+      - alert: AuthorizationDeniedBurst
+        expr: sum by (route) (rate(authz_denied_total[5m])) * 300 > 20
+        for: 5m
+        labels: {severity: ticket}
+        annotations:
+          summary: "Many 403s on {{ $labels.route }}: possible privilege or object probing"
+
+      - alert: DeprecatedApiVersionInUse
+        expr: sum(rate(http_requests_total{version="v1"}[1h])) > 0
+        for: 1h
+        labels: {severity: ticket}
+        annotations:
+          summary: "Traffic still hitting API v1 (change the label to your retired version)"
+
+  - name: data-safety
+    rules:
+      - alert: BackupTooOld
+        expr: time() - backup_last_success_timestamp_seconds > 26 * 3600
+        for: 10m
+        labels: {severity: page}
+        annotations:
+          summary: "No successful backup in the last 26 hours"
+          runbook: "https://example.invalid/runbooks/backup-too-old"
+
+  - name: infrastructure
+    rules:
+      - alert: DiskAlmostFull
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes) < 0.10
+        for: 10m
+        labels: {severity: page}
+        annotations:
+          summary: "{{ $labels.mountpoint }} has under 10% free"
+
+      - alert: CertExpiringSoon
+        expr: (probe_ssl_earliest_cert_expiry - time()) / 86400 < 14
+        for: 1h
+        labels: {severity: ticket}
+        annotations:
+          summary: "TLS certificate for {{ $labels.instance }} expires in {{ $value | humanize }} days"
+
+      - alert: RestartLoop
+        expr: increase(kube_pod_container_status_restarts_total[15m]) > 3
+        labels: {severity: page}
+        annotations:
+          summary: "{{ $labels.pod }} restarted more than 3 times in 15 minutes"

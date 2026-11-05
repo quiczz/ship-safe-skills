@@ -1,0 +1,62 @@
+# Real output of: python3 skills/motionsite/scripts/check_motion.py ./my-app
+# Run on a small test project with deliberately planted problems (not a real app).
+
+Motion audit: ./my-app
+10 FAIL, 17 WARN | video tags: 2, animation found: yes, reduced-motion handled: no
+
+  FAIL  [layout-animation] index.html:5
+        @keyframes slide animates left, width. Animate transform and opacity instead (layout properties cause jank).
+  FAIL  [viewport] index.html
+        Missing <meta name=viewport>. The page will not scale on phones.
+  FAIL  [img-alt] index.html:14
+        <img> without alt. Use alt text, or alt="" for decoration.
+  FAIL  [video-muted] index.html:12
+        autoplay without muted. Browsers block it, and sound on load is hostile.
+  FAIL  [video-playsinline] index.html:12
+        Missing playsinline. iOS will open the video full screen instead of playing it in the page.
+  FAIL  [video-poster] index.html:12
+        No poster. The poster is the first paint and the fallback for reduced motion.
+  FAIL  [video-playsinline] index.html:13
+        Missing playsinline. iOS will open the video full screen instead of playing it in the page.
+  FAIL  [video-poster] index.html:13
+        No poster. The poster is the first paint and the fallback for reduced motion.
+  FAIL  [reduced-motion] (site)
+        Animations exist but nothing handles prefers-reduced-motion. Add the media query (see references/performance-accessibility.md).
+  FAIL  [video-reduced-motion] (site)
+        Video exists but reduced motion / data saver are not handled. Show the poster instead of playing.
+  WARN  [transition-all] index.html:4
+        transition: all animates everything, including layout. List the properties.
+  WARN  [layout-transition] index.html:8
+        Transition on a layout property (width .3s, margin-left .3s). Prefer transform/opacity.
+  WARN  [hidden-until-js] index.html
+        .reveal starts at opacity 0 for everyone. Scope it under .js so content shows without JavaScript.
+  WARN  [focus-outline] index.html
+        a:focus removes the focus outline without a replacement.
+  WARN  [100vh] index.html
+        Uses 100vh. On phones the browser bar makes that taller than the screen; use 100svh (with 100vh fallback).
+  WARN  [scroll-listener] index.html:15
+        Scroll listener without { passive: true }. For reveals use IntersectionObserver; for effects use CSS scroll-driven animation or requestAnimationFrame.
+  WARN  [layout-read-on-scroll] index.html
+        Reads layout (getBoundingClientRect/offset*) in a scroll handler. Cache values or use IntersectionObserver.
+  WARN  [html-lang] index.html
+        <html> has no lang attribute.
+  WARN  [h1-count] index.html
+        2 <h1> elements; use exactly one.
+  WARN  [landmarks] index.html
+        No <main> landmark.
+  WARN  [video-size-attrs] index.html:12
+        No width/height; reserve space to avoid layout shift.
+  WARN  [video-preload] index.html:13
+        preload=auto downloads the whole video. Use preload="metadata".
+  WARN  [video-size-attrs] index.html:13
+        No width/height; reserve space to avoid layout shift.
+  WARN  [video-hotlink] index.html:12
+        Video loaded from https://cdn.example.com/hero.mp4. Host your own copy; do not hotlink.
+  WARN  [video-audio] assets/big.mp4
+        Has an audio track. Background video should have none (-an).
+  WARN  [video-resolution] assets/big.mp4
+        2560x1440 is larger than 1080p.
+  WARN  [video-offscreen] (site)
+        Video is never paused off screen (no IntersectionObserver found).
+
+Heuristic checks, not a full audit. Run Lighthouse and test by hand too.

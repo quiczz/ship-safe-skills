@@ -1,0 +1,119 @@
+{
+  "_note": "AWS EventBridge event patterns for Zero Trust alerts. One rule per entry; target an SNS topic or chat webhook. CloudTrail management events must be enabled in each region you care about (IAM and console sign-in events are global and arrive in us-east-1). These patterns follow documented CloudTrail event shapes but were not run against a live AWS account when written: send a test event and confirm delivery before relying on them.",
+  "console_login_without_mfa": {
+    "principle": 3,
+    "severity": "page for admins, ticket for users",
+    "pattern": {
+      "source": ["aws.signin"],
+      "detail-type": ["AWS Console Sign In via CloudTrail"],
+      "detail": {
+        "eventName": ["ConsoleLogin"],
+        "additionalEventData": { "MFAUsed": ["No"] },
+        "responseElements": { "ConsoleLogin": ["Success"] }
+      }
+    }
+  },
+  "root_account_used": {
+    "principle": "5, 6",
+    "severity": "page",
+    "pattern": {
+      "detail-type": ["AWS Console Sign In via CloudTrail", "AWS API Call via CloudTrail"],
+      "detail": { "userIdentity": { "type": ["Root"] } }
+    }
+  },
+  "audit_trail_tampered": {
+    "principle": 10,
+    "severity": "page",
+    "pattern": {
+      "source": ["aws.cloudtrail"],
+      "detail-type": ["AWS API Call via CloudTrail"],
+      "detail": {
+        "eventSource": ["cloudtrail.amazonaws.com"],
+        "eventName": ["StopLogging", "DeleteTrail", "UpdateTrail", "PutEventSelectors"]
+      }
+    }
+  },
+  "access_key_created": {
+    "principle": "2, 12",
+    "severity": "ticket",
+    "pattern": {
+      "source": ["aws.iam"],
+      "detail-type": ["AWS API Call via CloudTrail"],
+      "detail": { "eventSource": ["iam.amazonaws.com"], "eventName": ["CreateAccessKey"] }
+    }
+  },
+  "admin_policy_attached": {
+    "principle": "5, 6",
+    "severity": "page",
+    "pattern": {
+      "source": ["aws.iam"],
+      "detail-type": ["AWS API Call via CloudTrail"],
+      "detail": {
+        "eventSource": ["iam.amazonaws.com"],
+        "eventName": ["AttachUserPolicy", "AttachRolePolicy", "AttachGroupPolicy"],
+        "requestParameters": { "policyArn": ["arn:aws:iam::aws:policy/AdministratorAccess"] }
+      }
+    }
+  },
+  "inline_policy_or_trust_changed": {
+    "principle": 5,
+    "severity": "ticket",
+    "pattern": {
+      "source": ["aws.iam"],
+      "detail-type": ["AWS API Call via CloudTrail"],
+      "detail": {
+        "eventSource": ["iam.amazonaws.com"],
+        "eventName": ["PutUserPolicy", "PutRolePolicy", "PutGroupPolicy", "UpdateAssumeRolePolicy", "CreatePolicyVersion"]
+      }
+    }
+  },
+  "mfa_removed": {
+    "principle": 3,
+    "severity": "page",
+    "pattern": {
+      "source": ["aws.iam"],
+      "detail-type": ["AWS API Call via CloudTrail"],
+      "detail": {
+        "eventSource": ["iam.amazonaws.com"],
+        "eventName": ["DeactivateMFADevice", "DeleteVirtualMFADevice"]
+      }
+    }
+  },
+  "security_group_open_to_world": {
+    "principle": 7,
+    "severity": "page",
+    "pattern": {
+      "source": ["aws.ec2"],
+      "detail-type": ["AWS API Call via CloudTrail"],
+      "detail": {
+        "eventSource": ["ec2.amazonaws.com"],
+        "eventName": ["AuthorizeSecurityGroupIngress"],
+        "requestParameters": { "ipPermissions": { "items": { "ipRanges": { "items": { "cidrIp": ["0.0.0.0/0"] } } } } }
+      }
+    }
+  },
+  "bucket_exposure_changed": {
+    "principle": "7, 8",
+    "severity": "page",
+    "pattern": {
+      "source": ["aws.s3"],
+      "detail-type": ["AWS API Call via CloudTrail"],
+      "detail": {
+        "eventSource": ["s3.amazonaws.com"],
+        "eventName": ["PutBucketPolicy", "PutBucketAcl", "DeleteBucketPolicy", "DeletePublicAccessBlock", "PutBucketPublicAccessBlock"]
+      }
+    }
+  },
+  "kms_key_disabled_or_scheduled_for_deletion": {
+    "principle": 8,
+    "severity": "page",
+    "pattern": {
+      "source": ["aws.kms"],
+      "detail-type": ["AWS API Call via CloudTrail"],
+      "detail": {
+        "eventSource": ["kms.amazonaws.com"],
+        "eventName": ["ScheduleKeyDeletion", "DisableKey"]
+      }
+    }
+  }
+}

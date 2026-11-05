@@ -1,0 +1,72 @@
+# Real output of: python3 skills/app-readiness-audit/scripts/scan.py ./my-app
+# Run on a small test project with deliberately planted problems (not a real app).
+
+# Readiness scan: `./my-app`
+
+Files scanned: 4  |  Stack hint: unknown
+
+> Heuristic leads only. Verify each by reading the code. Absence of a signal means 'not found by pattern', not 'missing'.
+
+## Risky patterns
+
+| Severity | Area | Problem | Where |
+|---|---|---|---|
+| critical | 2 Secret keys | A .env file is tracked by git: treat every key in it as leaked and rotate | `.env` |
+| critical | 2 Secret keys | Stripe live key found in code (starts 'sk_l***'): rotate it and move it to the environment | `src/server.js:3` |
+| critical | 2 Secret keys | DB URL with password found in code (starts 'Supe***'): rotate it and move it to the environment | `src/server.js:4` |
+| critical | 2 Secret keys | hardcoded credential found in code (starts 'abcd***'): rotate it and move it to the environment | `src/server.js:5` |
+| high | 11 Error handling | Error stack/message sent back to the client | `src/server.js:16` |
+| high | 12 Log flow | Logging request bodies/headers or credentials | `src/server.js:8` |
+| high | 2 Secret keys | Variable 'NEXT_PUBLIC_SERVICE_ROLE_KEY' is exposed to the browser by its prefix yet looks secret | `.env.local:1` |
+| high | 3 Database | SQL built with string concatenation/interpolation | `src/server.js:9` |
+| high | 5 Password reset | Predictable randomness in a file that handles tokens/resets | `src/server.js:13` |
+| medium | 10 Input cleaning | Raw HTML sink (check input is sanitized) | `src/server.js:18` |
+| medium | 11 Error handling | Swallowed exception (empty catch/except) | `src/server.js:17` |
+
+## .env hygiene
+
+- .env files present: ['.env', '.env.local']
+- .gitignore covers .env: False
+- tracked by git: ['.env']
+
+## Evidence by area
+
+### 1 Mobile
+- viewport meta: `index.html:1`
+
+### 2 Secret keys
+- no signals found: check by hand
+
+### 3 Database
+- no signals found: check by hand
+
+### 4 Rate limiting
+- no signals found: check by hand
+
+### 5 Password reset
+- reset flow: `src/server.js:12`
+
+### 6 Rollbacks
+- no signals found: check by hand
+
+### 7 Backups
+- no signals found: check by hand
+
+### 8 Usage limits
+- no signals found: check by hand
+
+### 9 Analytics
+- no signals found: check by hand
+
+### 10 Input cleaning
+- no signals found: check by hand
+
+### 11 Error handling
+- global error handler: `src/server.js:16`
+
+### 12 Log flow
+- no signals found: check by hand
+
+### 13 Monitor and alerts
+- no signals found: check by hand
+

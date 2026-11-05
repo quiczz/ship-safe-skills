@@ -1,0 +1,19 @@
+{
+  "name": "ship-safe-skills",
+  "owner": {
+    "name": "quiczz"
+  },
+  "metadata": {
+    "description": "Security, reliability, UI and documentation skills for Claude Code, with autopilot hooks so they run on their own."
+  },
+  "plugins": [
+    {
+      "name": "ship-safe-skills",
+      "source": "./",
+      "description": "Eight skills that check, build and watch your app and run on their own: readiness audit, monitoring and alerts, API security, Zero Trust, skeleton loading, motion sites, build-flow map, session journal. Includes autopilot hooks.",
+      "version": "1.2.0",
+      "category": "security",
+      "license": "MIT"
+    }
+  ]
+}

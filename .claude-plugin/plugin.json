@@ -1,0 +1,27 @@
+{
+  "name": "ship-safe-skills",
+  "version": "1.2.0",
+  "description": "Eight skills that check, build and watch your app, and run on their own: app readiness audit, monitoring and alerts, API security guard (12 rules), Zero Trust review (12 principles), skeletonizer, motionsite, build-flow map, and session journal. Includes autopilot hooks.",
+  "author": {
+    "name": "quiczz"
+  },
+  "homepage": "https://github.com/quiczz/ship-safe-skills",
+  "repository": "https://github.com/quiczz/ship-safe-skills",
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "zero-trust",
+    "api-security",
+    "monitoring",
+    "audit",
+    "owasp",
+    "skills",
+    "skeleton",
+    "loading-state",
+    "ux",
+    "autopilot",
+    "hooks",
+    "motion",
+    "landing-page"
+  ]
+}

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skeletonizer demo</title>
+<style>
+/* Skeletonizer - shared styles. Copy into your global CSS or import once.
+   Mirror mode:  <span class="sk" style="width:120px;height:16px"></span>
+   Overlay mode: <div data-loading="true"> <h2 class="sk-o">Placeholder</h2> </div>
+   Keep it calm: one slow animation, none under reduced motion. */
+
+:root {
+  --sk-base: #e5e7eb;
+  --sk-highlight: #f3f4f6;
+  --sk-radius: 6px;
+  --sk-speed: 1.5s;
+  --sk-show-after: 200ms; /* .sk-delayed appears only if loading lasts longer than this */
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --sk-base: #2a2d34; --sk-highlight: #363a43; }
+}
+:root[data-theme="dark"] { --sk-base: #2a2d34; --sk-highlight: #363a43; }
+
+/* ---------- Mirror mode: standalone placeholder blocks ---------- */
+.sk {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--sk-base);
+  border-radius: var(--sk-radius);
+  min-height: 1em;
+}
+.sk::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--sk-highlight), transparent);
+  animation: sk-shimmer var(--sk-speed) ease-in-out infinite;
+}
+.sk-circle { border-radius: 50%; }
+.sk-inline { display: inline-block; vertical-align: middle; }
+@keyframes sk-shimmer { to { transform: translateX(100%); } }
+
+/* ---------- Overlay mode: the real element is painted over while loading ----------
+   Put .sk-o on block elements (headings, paragraphs, wrappers around images).
+   Children are hidden, so wrap an <img> in an element and put .sk-o on the wrapper.
+   Use placeholder text of a similar length so layout does not move, and set
+   aria-hidden="true" on .sk-o elements while loading. */
+[data-loading="true"] .sk-o {
+  color: transparent !important;
+  text-shadow: none !important;
+  border-color: transparent !important;
+  background: linear-gradient(90deg, var(--sk-base) 25%, var(--sk-highlight) 50%, var(--sk-base) 75%) 0 0 / 200% 100%;
+  animation: sk-bg var(--sk-speed) linear infinite;
+  pointer-events: none;
+  user-select: none;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+[data-loading="true"] .sk-o > * { visibility: hidden; }
+/* default corner radius with zero specificity, so your own border-radius (a round avatar) still wins */
+:where([data-loading="true"] .sk-o) { border-radius: var(--sk-radius); }
+@keyframes sk-bg { to { background-position: -200% 0; } }
+
+/* ---------- Avoid flashes on fast loads (CSS only) ---------- */
+.sk-delayed {
+  opacity: 0;
+  animation: sk-appear 0s linear var(--sk-show-after) forwards;
+}
+@keyframes sk-appear { to { opacity: 1; } }
+
+/* ---------- Screen-reader text for the loading region ---------- */
+.sk-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk::after { animation: none; display: none; }
+  [data-loading="true"] .sk-o { animation: none; background: var(--sk-base); }
+  .sk-delayed { animation-duration: 0s; }
+}
+
+/* demo page only */
+:root { --bg:#fff; --fg:#111827; --muted:#6b7280; --line:#e5e7eb; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#16181d; --fg:#f3f4f6; --muted:#9ca3af; --line:#2a2d34; } }
+:root[data-theme="dark"] { --bg:#16181d; --fg:#f3f4f6; --muted:#9ca3af; --line:#2a2d34; }
+body { margin:0; padding:24px 16px; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+main { max-width:880px; margin:0 auto; }
+.bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+button { font:inherit; padding:6px 12px; border:1px solid var(--line); background:transparent; color:inherit; border-radius:8px; cursor:pointer; }
+.cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; }
+h2 { font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin:0 0 12px; }
+.card { border:1px solid var(--line); border-radius:12px; padding:16px; }
+.row { display:flex; gap:12px; align-items:center; height:64px; }
+.avatar { width:40px; height:40px; border-radius:50%; background:#6366f1; color:#fff; display:grid; place-items:center; flex-shrink:0; }
+.name { font-weight:600; line-height:22px; } .sub { color:var(--muted); font-size:14px; line-height:22px; }
+.line { height:22px; padding-block:4px; box-sizing:border-box; }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar">
+    <button id="toggle">Toggle loading</button>
+    <button id="theme">Toggle dark</button>
+    <span style="color:var(--muted)">Both columns show the same list. Toggle to compare loaded and loading.</span>
+  </div>
+  <div class="cols">
+    <section>
+      <h2>Mirror mode (separate skeleton)</h2>
+      <div class="card" id="mirror"></div>
+    </section>
+    <section>
+      <h2>Overlay mode (real markup, painted over)</h2>
+      <div class="card" id="overlay" data-loading="false"></div>
+    </section>
+  </div>
+</main>
+<script>
+const people = [["Ada Lovelace","Analytical engines"],["Grace Hopper","Compilers"],["Alan Turing","Computability"],["Edsger Dijkstra","Algorithms"]];
+const mirror = document.getElementById("mirror");
+const overlay = document.getElementById("overlay");
+let loading = false;
+
+function mirrorLoaded() {
+  return people.map(([n,s]) => `<div class="row"><div class="avatar">${n[0]}</div><div><div class="name">${n}</div><div class="sub">${s}</div></div></div>`).join("");
+}
+function mirrorSkeleton() {
+  return `<div role="status" aria-busy="true"><span class="sk-sr-only">Loading people</span>` +
+    people.map(() => `<div class="row"><span class="sk sk-circle" aria-hidden="true" style="width:40px;height:40px;flex-shrink:0"></span>
+      <div style="flex:1"><div class="line"><span class="sk" aria-hidden="true" style="height:100%;width:45%"></span></div>
+      <div class="line"><span class="sk" aria-hidden="true" style="height:100%;width:30%"></span></div></div></div>`).join("") + `</div>`;
+}
+function overlayMarkup(isLoading) {
+  // Same markup both ways. While loading, use placeholder text of similar length and aria-hidden.
+  const ah = isLoading ? ' aria-hidden="true"' : "";
+  return people.map(([n,s]) => {
+    const name = isLoading ? "Placeholder name" : n, sub = isLoading ? "Placeholder text" : s;
+    return `<div class="row"><div class="avatar sk-o"${ah}>${isLoading ? "" : n[0]}</div><div><div class="name sk-o"${ah}>${name}</div><div class="sub sk-o"${ah} style="margin-top:2px">${sub}</div></div></div>`;
+  }).join("");
+}
+function render() {
+  mirror.innerHTML = loading ? mirrorSkeleton() : mirrorLoaded();
+  overlay.dataset.loading = String(loading);
+  overlay.setAttribute("aria-busy", String(loading));
+  overlay.innerHTML = overlayMarkup(loading);
+}
+document.getElementById("toggle").onclick = () => { loading = !loading; render(); };
+document.getElementById("theme").onclick = () => {
+  const r = document.documentElement; r.dataset.theme = r.dataset.theme === "dark" ? "light" : "dark";
+};
+if (location.hash === "#loading") loading = true;
+if (location.hash.includes("dark")) document.documentElement.dataset.theme = "dark";
+render();
+</script>
+</body>
+</html>

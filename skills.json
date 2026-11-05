@@ -1,0 +1,214 @@
+{
+  "_comment": "Third-party skills are NOT copied into this repo. install.py downloads them from the original authors' GitHub repos at the commit listed in 'pinned' (reviewed 2026-11-06). Use --latest to take the newest default branch instead.",
+  "upstream": [
+    {
+      "id": "rea",
+      "title": "REA - Reverse Engineer Anything",
+      "repo": "morluto/rea",
+      "pinned": "560674e2de851cec3f670be8297d28835009247a",
+      "license": "MIT",
+      "paths": [
+        ".agents/skills/reverse-engineer-anything"
+      ],
+      "note": "The skill drives the REA tool. For full power also run: npx skills add morluto/rea (installs REA tooling) or see https://github.com/morluto/rea. A lighter alternative exists: aicodeking/leanrea."
+    },
+    {
+      "id": "security-auth",
+      "title": "Secure Claude Skills (auth, CSRF, rate limiting, input validation, error handling, headers ...)",
+      "repo": "harperaa/secure-claude-skills",
+      "pinned": "c0b4abbf50f2bab3c0b4ba404ac9c04355fb0223",
+      "license": "MIT",
+      "paths": [
+        "auth-security",
+        "csrf-protection",
+        "dependency-security",
+        "error-handling",
+        "input-validation",
+        "payment-security",
+        "rate-limiting",
+        "security-headers",
+        "security-operations",
+        "security-overview",
+        "security-testing"
+      ],
+      "note": "You wrote 'security-auth-skill' without an author. This is the closest match found (Clerk/Next.js/Convex oriented). Swap the repo in this file if you meant another one."
+    },
+    {
+      "id": "stitch",
+      "title": "Google Stitch skills",
+      "repo": "google-labs-code/stitch-skills",
+      "pinned": "0337446dadde6f8c94210444e2aa9d546126480f",
+      "license": "Apache-2.0",
+      "paths": [
+        "plugins/*/skills/*"
+      ],
+      "note": "Needs the Stitch MCP server and a Stitch account/API key to do anything useful."
+    },
+    {
+      "id": "interface-design",
+      "title": "Interface Design",
+      "repo": "Dammyjay93/interface-design",
+      "pinned": "2f9be3206855bcb2d1d0af262c8bae25cba6658d",
+      "license": "MIT",
+      "paths": [
+        ".claude/skills/interface-design"
+      ]
+    },
+    {
+      "id": "scroll-world",
+      "title": "Scroll World (scroll-scrubbed 3D landing pages)",
+      "repo": "oso95/scroll-world",
+      "pinned": "71cc36d3bb150248ae36a2c552f9cbf88802a79c",
+      "license": "MIT",
+      "paths": [
+        "skills/scroll-world"
+      ],
+      "note": "Generating assets costs money (Monid or Higgsfield credits) and needs ffmpeg + Python Pillow. The skill states the estimate before spending."
+    },
+    {
+      "id": "frontend-slides",
+      "title": "Frontend Slides",
+      "repo": "zarazhangrui/frontend-slides",
+      "pinned": "9906a34d640d2111f724544cbc50f7f130569ae1",
+      "license": "MIT",
+      "paths": [
+        "plugins/frontend-slides/skills/frontend-slides"
+      ],
+      "note": "PowerPoint conversion needs: pip install python-pptx Pillow"
+    },
+    {
+      "id": "website-cloner",
+      "title": "AI Website Cloner (/clone-website)",
+      "repo": "JCodesMore/ai-website-cloner-template",
+      "pinned": "ee3f5a2f31fd549b9593fa4f7cf6d2955ee593bb",
+      "license": "MIT",
+      "paths": [
+        ".agents/skills/clone-website"
+      ],
+      "note": "Upstream is a Next.js project template. Only the skill is installed here; for the full flow use 'Use this template' on GitHub. Only clone sites you have the right to copy."
+    },
+    {
+      "id": "hallmark",
+      "title": "Hallmark (anti-AI-slop design)",
+      "repo": "Nutlope/hallmark",
+      "pinned": "407fa689f4a276f2fd389208d271d0fef08f5058",
+      "license": "MIT",
+      "paths": [
+        "skills/hallmark"
+      ]
+    },
+    {
+      "id": "diagram-design",
+      "title": "Diagram Design",
+      "repo": "cathrynlavery/diagram-design",
+      "pinned": "f24d98b05e2d7a5e68c2dedfe46e5b7173f50118",
+      "license": "MIT",
+      "paths": [
+        "skills/diagram-design"
+      ]
+    },
+    {
+      "id": "archify",
+      "title": "Archify (architecture and flow diagrams)",
+      "repo": "tt-a1i/archify",
+      "pinned": "a4065941f12be7967436261d9934784e381d423c",
+      "license": "Apache-2.0",
+      "paths": [
+        "archify"
+      ],
+      "note": "Large (about 18 MB)."
+    },
+    {
+      "id": "taste-skill",
+      "title": "Taste Skill (design-taste-frontend)",
+      "repo": "Leonxlnx/taste-skill",
+      "pinned": "9b4bf937a1f69348126959c15d2f99a73e65699b",
+      "license": "MIT",
+      "paths": [
+        "skills/taste-skill"
+      ],
+      "note": "Large (about 35 MB)."
+    },
+    {
+      "id": "ui-ux-pro-max",
+      "title": "UI UX Pro Max",
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "pinned": "b7d5353e0130feb8c5574ef1251f8a1db1873ccb",
+      "license": "MIT",
+      "paths": [
+        ".claude/skills/ui-ux-pro-max"
+      ],
+      "note": "Its search script needs Python 3."
+    },
+    {
+      "id": "awesome-design-md",
+      "title": "Awesome DESIGN.md (84 brand design systems)",
+      "repo": "VoltAgent/awesome-design-md",
+      "pinned": "fcc70284932276d085f01ef9f83edde90b1258cb",
+      "license": "MIT",
+      "kind": "corpus",
+      "corpus_path": "design-md",
+      "wrapper": "wrappers/awesome-design-md",
+      "note": "Upstream has no SKILL.md (it is a collection of DESIGN.md files). The installer downloads the collection and adds the wrapper skill from this repo."
+    },
+    {
+      "id": "impeccable",
+      "title": "Impeccable (design commands: audit, polish, critique ...)",
+      "repo": "pbakaus/impeccable",
+      "pinned": "c8891a9ae865d6ee311836ae5199bfce0fe115b1",
+      "license": "Apache-2.0",
+      "paths": [
+        ".claude/skills/impeccable"
+      ],
+      "note": "Upstream also ships a CLI: npx impeccable. See https://github.com/pbakaus/impeccable"
+    },
+    {
+      "id": "web-design-guidelines",
+      "title": "Vercel Web Interface Guidelines review",
+      "repo": "vercel-labs/agent-skills",
+      "pinned": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+      "license": "see upstream (no LICENSE file at repo root when reviewed)",
+      "paths": [
+        "skills/web-design-guidelines"
+      ],
+      "note": "At run time this skill fetches the latest rules from raw.githubusercontent.com/vercel-labs/web-interface-guidelines."
+    }
+  ],
+  "mcp": [
+    {
+      "id": "playwright-mcp",
+      "title": "Playwright MCP (Microsoft)",
+      "repo": "microsoft/playwright-mcp",
+      "license": "Apache-2.0",
+      "claude_command": [
+        "claude",
+        "mcp",
+        "add",
+        "playwright",
+        "--",
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+      "note": "This is an MCP server, not a skill. It is registered with 'claude mcp add'. It downloads @playwright/mcp from npm each run."
+    }
+  ],
+  "manual": [
+    {
+      "id": "aisoc",
+      "title": "AiSOC (open-source AI security operations center)",
+      "repo": "beenuar/AiSOC",
+      "license": "MIT",
+      "note": "AiSOC is a full self-hosted platform (Docker Compose, about 8 GB RAM), NOT a Claude skill, so it is not auto-installed. It does ship an MCP server (@aisoc/mcp) that talks to YOUR running AiSOC instance: claude mcp add aisoc -- npx -y @aisoc/mcp --aisoc-url https://YOUR-AISOC --api-key YOUR_KEY. Project README: https://github.com/beenuar/AiSOC"
+    }
+  ],
+  "own": [
+    "app-readiness-audit",
+    "monitor-alerts-builder",
+    "session-journal",
+    "build-flow-map",
+    "api-security-guard",
+    "zero-trust-review",
+    "skeletonizer",
+    "motionsite"
+  ]
+}

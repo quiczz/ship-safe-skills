@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-labelledby="t d">
+  <title id="t">Ship Safe Skills</title>
+  <desc id="d">Eight skills for Claude Code that check, build and watch your app, and run on their own.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b0d12"/><stop offset="1" stop-color="#121735"/></linearGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="46"/></filter>
+    <linearGradient id="shield" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8fa8ff"/><stop offset="1" stop-color="#14d3bd"/></linearGradient>
+  </defs>
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <g filter="url(#blur)" opacity=".85">
+    <circle cx="1080" cy="60" r="130" fill="#5566ff"/>
+    <circle cx="1220" cy="260" r="110" fill="#14d3bd"/>
+    <circle cx="880" cy="310" r="90" fill="#c26bff"/>
+  </g>
+  <!-- shield mark -->
+  <g transform="translate(1030 62)">
+    <path d="M100 0 L190 30 V110 C190 170 150 205 100 228 C50 205 10 170 10 110 V30 Z" fill="rgb(255 255 255 / .06)" stroke="url(#shield)" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M58 112 L90 144 L148 78" fill="none" stroke="url(#shield)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="64" y="128" fill="#f4f6fb" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="68" font-weight="700" letter-spacing="-2">Ship Safe Skills</text>
+  <text x="66" y="172" fill="#b4bccd" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="25">Eight skills for Claude Code that check, build and watch your app.</text>
+  <text x="66" y="206" fill="#8fa8ff" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="25" font-weight="600">They run on their own: install once, no need to call them.</text>
+  <g font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="600" fill="#dfe5f5">
+    <g transform="translate(64 240)">
+      <rect width="118" height="32" rx="16" fill="rgb(255 255 255 / .08)" stroke="rgb(255 255 255 / .18)"/><text x="59" y="21" text-anchor="middle">readiness</text>
+      <g transform="translate(128 0)"><rect width="104" height="32" rx="16" fill="rgb(255 255 255 / .08)" stroke="rgb(255 255 255 / .18)"/><text x="52" y="21" text-anchor="middle">monitor</text></g>
+      <g transform="translate(242 0)"><rect width="104" height="32" rx="16" fill="rgb(255 255 255 / .08)" stroke="rgb(255 255 255 / .18)"/><text x="52" y="21" text-anchor="middle">journal</text></g>
+      <g transform="translate(356 0)"><rect width="104" height="32" rx="16" fill="rgb(255 255 255 / .08)" stroke="rgb(255 255 255 / .18)"/><text x="52" y="21" text-anchor="middle">flow map</text></g>
+      <g transform="translate(470 0)"><rect width="124" height="32" rx="16" fill="rgb(255 255 255 / .08)" stroke="rgb(255 255 255 / .18)"/><text x="62" y="21" text-anchor="middle">API security</text></g>
+      <g transform="translate(604 0)"><rect width="110" height="32" rx="16" fill="rgb(255 255 255 / .08)" stroke="rgb(255 255 255 / .18)"/><text x="55" y="21" text-anchor="middle">zero trust</text></g>
+      <g transform="translate(724 0)"><rect width="112" height="32" rx="16" fill="rgb(255 255 255 / .08)" stroke="rgb(255 255 255 / .18)"/><text x="56" y="21" text-anchor="middle">skeletons</text></g>
+      <g transform="translate(846 0)"><rect width="112" height="32" rx="16" fill="rgb(255 255 255 / .08)" stroke="rgb(255 255 255 / .18)"/><text x="56" y="21" text-anchor="middle">motion site</text></g>
+    </g>
+  </g>
+</svg>

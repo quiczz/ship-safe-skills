@@ -1,0 +1,37 @@
+# What autopilot says, by itself, at each point. Real output from hooks/autopilot.py.
+
+## 1. You type: "get this app ready to launch and add a skeleton loading state"  (UserPromptSubmit)
+
+[ship-safe-skills] This request matches: the app-readiness-audit skill, the skeletonizer skill. Use it.
+
+
+## 2. Claude writes src/config.js containing a database URL, a hard-coded key and a risky TLS setting  (PostToolUse)
+
+(Claude receives this as a note; the secret values themselves are never printed.)
+
+ship-safe-skills check on the file you just wrote:
+- AWS access key written into src/config.js (line 1). Move it to an environment variable or secret manager. If it was ever committed or shared, rotate it.
+- GitHub token written into src/config.js (line 2). Move it to an environment variable or secret manager. If it was ever committed or shared, rotate it.
+- database URL with password written into src/config.js (line 3). Move it to an environment variable or secret manager. If it was ever committed or shared, rotate it.
+- hard-coded secret-looking value in src/config.js (line 4). Read it from an environment variable instead. If it is real, rotate it.
+- secret in a URL query string in src/config.js (line 9). Send secrets in an Authorization header, not in the URL (URLs end up in logs and history).
+- TLS verification turned off in src/config.js (line 10). Turn certificate checks back on; fix the certificate instead.
+- wildcard CORS origin in src/config.js (line 11). Allow only the origins that need it, especially if cookies or auth headers are used.
+Tell the user in one line and fix it unless they said otherwise.
+
+
+## 3. Claude opens a new session in a project  (SessionStart)
+
+[ship-safe-skills autopilot is on]
+Use these skills on your own, without waiting to be asked:
+- Before you call a feature done or ready to ship: check it against app-readiness-audit (secrets, input validation, errors, rate limits, backups) and fix the gaps you caused.
+- When you add or change an API route, auth or a token: apply api-security-guard (12 rules). When you touch IAM, service accounts, CI secrets or network config: apply zero-trust-review.
+- When you build UI that loads data: make the loading state a layout-matching skeleton (skeletonizer), not a bare spinner or blank area.
+- When asked for a landing page, hero or animated site: use motionsite, then run its check_motion.py audit.
+- After a structural change (new service, framework, env var, route group): update docs/BUILD_FLOW.md (build-flow-map).
+- When something is about to be deployed with no alerting: offer monitor-alerts-builder.
+Already running by themselves: edited files are checked for committed secrets and risky settings; session transcripts are saved with secrets masked to .claude/journal/ (git-ignored).
+Mention a finding to the user in one line, fix it, and move on. To switch parts off: python3 "<plugin>/hooks/autopilot.py" off all|context|hints|secrets|journal
+Project notes:
+- This project has no docs/BUILD_FLOW.md. When there is a natural pause, offer to create it with build-flow-map.
+- Tell the user once: session transcripts are saved (secrets masked) to .claude/journal/transcripts/ and are git-ignored; they can switch this off.

@@ -1,0 +1,46 @@
+# Real output of: python3 skills/skeletonizer/scripts/find_loading_candidates.py ./my-app
+# Run on a small test project with deliberately planted problems (not a real app).
+
+Skeleton candidates for ./my-app
+Frameworks: Next.js, React, TanStack Query, Tailwind | files scanned: 19
+8 lead(s) to look at, 1 file(s) already have skeletons.
+
+== spinner-for-content (3)
+  [high] lib/screens/feed_screen.dart:9
+        return const Center(child: CircularProgressIndicator());
+        -> Replace with a skeleton of the content that will appear (keep spinners for button actions).
+  [medium] components/OrderTable.vue:7
+        <div v-if="loading">Loading...</div>
+        -> Replace with a skeleton of the content that will appear (keep spinners for button actions).
+  [medium] components/UserList.tsx:6
+        if (isLoading) return <Spinner />;
+        -> Replace with a skeleton of the content that will appear (keep spinners for button actions).
+
+== blank-while-loading (1)
+  [medium] components/Comments.tsx:5
+        if (isPending) return null;
+        -> Renders nothing while loading, so the area is blank then jumps. Render a skeleton instead.
+
+== no-loading-state (1)
+  [medium] components/Feed.tsx:5
+        useEffect(() => { fetch("/api/posts").then(r => r.json()).then(setPosts); }, []);
+        -> Fetches on the client but never handles the loading phase. Find where the data is stored and add a skeleton for 'no data yet'.
+
+== route-missing-loading (2)
+  [high] app/dashboard/page.tsx:3
+        const res = await fetch("https://api.example.com/dash");
+        -> Server page awaits data and has no loading.* in this folder or any parent. Add loading.tsx (mirror mode) or a <Suspense> around the slow part.
+  [medium] app/profile/page.tsx:2
+        export default async function Profile(){ const c = cookies(); return <main>{String(c)}</main>; }
+        -> Page renders per request (cookies/headers/searchParams). Navigation waits on the server, so a loading.tsx makes it feel instant.
+
+== async-component-no-suspense (1)
+  [high] components/Stats.tsx:1
+        export default async function Stats() {
+        -> Stats awaits data and is used without a <Suspense> boundary nearby (1 usage(s)). Wrap it in <Suspense fallback={<...Skeleton />}> so the rest of the page renders first.
+
+== already-skeleton (1)
+  [info] components/ProjectCard.tsx:3
+        import { Skeleton } from "./Skeleton";
+
+These are leads from pattern matching, not verdicts. Open each file before changing it.

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumen - Light that thinks with you</title>
+<meta name="description" content="Replace this with one sentence about your product.">
+<meta name="theme-color" content="#0b0d12">
+<style>
+/* ===== 1. Tokens: change these first ===== */
+:root {
+  --bg: #0b0d12;
+  --surface: rgb(255 255 255 / .06);
+  --line: rgb(255 255 255 / .14);
+  --text: #f4f6fb;
+  --muted: #b4bccd;          /* 8.9:1 on --bg */
+  --accent: #8fa8ff;
+  --accent-ink: #0b0d12;      /* text on accent buttons */
+  --radius: 20px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --font-display: "Inter Tight", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-body: Inter, "Helvetica Neue", Arial, system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; color-scheme: dark; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 1rem/1.6 var(--font-body); -webkit-font-smoothing: antialiased; }
+img, video { max-width: 100%; display: block; }
+a { color: inherit; }
+.wrap { width: min(1120px, 100% - 2rem); margin-inline: auto; }
+.skip { position: absolute; left: 1rem; top: -4rem; background: var(--accent); color: var(--accent-ink); padding: .6rem 1rem; border-radius: 8px; z-index: 100; }
+.skip:focus { top: 1rem; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+section[id] { scroll-margin-top: 5rem; }
+
+/* ===== 2. Navigation (glass) ===== */
+.nav { position: fixed; inset: 1rem 0 auto; z-index: 50; }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .6rem .6rem .6rem 1.2rem; }
+.glass { background: var(--surface); border: 1px solid var(--line); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); border-radius: 999px; }
+@supports not (backdrop-filter: blur(1px)) { .glass { background: rgb(20 22 30 / .88); } }
+.brand { font: 700 1.15rem var(--font-display); letter-spacing: -.02em; text-decoration: none; }
+.nav ul { display: flex; gap: 1.6rem; list-style: none; margin: 0; padding: 0; }
+.nav ul a { text-decoration: none; color: var(--muted); font-size: .95rem; transition: color .18s; }
+.nav ul a:hover { color: var(--text); }
+@media (max-width: 640px) { .nav ul { display: none; } .scroll-cue { display: none; } }
+
+/* ===== 3. Buttons ===== */
+.btn { position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: .5rem; padding: .9rem 1.6rem; border-radius: 999px; font: 600 1rem var(--font-body); text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: transform .18s var(--ease), filter .18s; }
+.btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / .45) 50%, transparent 70%); transform: translateX(-120%); animation: sweep 4.5s var(--ease) 1.6s infinite; }
+@keyframes sweep { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+.btn-ghost { background: var(--surface); border-color: var(--line); color: var(--text); }
+.btn-ghost.glass { border-radius: 999px; }
+
+/* ===== 4. Hero ===== */
+.hero { position: relative; min-height: 100svh; display: grid; align-items: end; isolation: isolate; overflow: clip; }
+.hero-media { position: absolute; inset: 0; z-index: -2; background: #0b0d12; }
+/* CSS-only animated background: a finished look until you add real video. Uses transform/opacity only. */
+.aurora { position: absolute; inset: -20%; filter: blur(70px) saturate(140%); }
+.aurora span { position: absolute; width: 70vmax; height: 70vmax; border-radius: 50%; will-change: transform; }
+.aurora span:nth-child(1) { left: -10%; top: -15%; background: radial-gradient(circle at 30% 30%, #5566ff 0%, rgb(85 102 255 / .55) 30%, transparent 62%); animation: drift1 18s ease-in-out infinite alternate; }
+.aurora span:nth-child(2) { right: -15%; top: 5%; background: radial-gradient(circle at 60% 40%, #14d3bd 0%, rgb(20 211 189 / .45) 30%, transparent 62%); animation: drift2 22s ease-in-out infinite alternate; }
+.aurora span:nth-child(3) { left: 20%; bottom: -30%; background: radial-gradient(circle at 50% 50%, #c26bff 0%, rgb(194 107 255 / .5) 30%, transparent 62%); animation: drift3 26s ease-in-out infinite alternate; }
+@keyframes drift1 { to { transform: translate3d(12vmax, 8vmax, 0) scale(1.15); } }
+@keyframes drift2 { to { transform: translate3d(-10vmax, 10vmax, 0) scale(.9); } }
+@keyframes drift3 { to { transform: translate3d(8vmax, -9vmax, 0) scale(1.1); } }
+/* Real video sits on top of the gradient when present */
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .8s; }
+.hero-video.is-ready { opacity: 1; }
+.hero::before { /* overlay keeps text readable; light over the gradient, strong over real footage */
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, rgb(11 13 18 / .25) 0%, rgb(11 13 18 / .1) 40%, rgb(11 13 18 / .8) 100%);
+}
+.hero.has-video::before {
+  background:
+    linear-gradient(90deg, rgb(11 13 18 / .6) 0%, rgb(11 13 18 / .25) 55%, transparent 80%),
+    linear-gradient(180deg, rgb(11 13 18 / .55) 0%, rgb(11 13 18 / .3) 38%, rgb(11 13 18 / .88) 100%);
+}
+.hero-inner { padding-block: 9rem 4.5rem; }
+.eyebrow { display: inline-block; padding: .35rem .9rem; font-size: .85rem; letter-spacing: .04em; color: var(--muted); border-radius: 999px; margin-bottom: 1.4rem; }
+h1 { margin: 0 0 1.4rem; font: 600 clamp(2.6rem, 6vw, 5.5rem)/1.02 var(--font-display); letter-spacing: -.03em; max-width: 14ch; }
+.word { display: inline-block; opacity: 0; transform: translateY(.5em); animation: rise .7s var(--ease) forwards; animation-delay: calc(var(--i) * 70ms + 150ms); }
+@keyframes rise { to { opacity: 1; transform: none; } }
+.lead { font-size: clamp(1.1rem, 1.6vw, 1.3rem); color: var(--muted); max-width: 38rem; margin: 0 0 2rem; opacity: 0; animation: rise .7s var(--ease) .75s forwards; }
+.cta-row { display: flex; flex-wrap: wrap; gap: .8rem; opacity: 0; animation: rise .7s var(--ease) .95s forwards; }
+.scroll-cue { position: absolute; bottom: 1.4rem; left: 50%; width: 1.5rem; height: 2.4rem; margin-left: -.75rem; border: 1.5px solid rgb(255 255 255 / .5); border-radius: 999px; transition: opacity .3s; }
+.scroll-cue::after { content: ""; position: absolute; top: .45rem; left: 50%; width: 3px; height: 7px; margin-left: -1.5px; border-radius: 2px; background: #fff; animation: cue 1.8s ease-in-out infinite; }
+@keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70%, 100% { transform: translateY(.8rem); opacity: 0; } }
+.pause { position: absolute; right: 1rem; bottom: 1rem; padding: .5rem .9rem; font: 500 .85rem var(--font-body); color: var(--text); cursor: pointer; display: none; }
+.pause.is-visible { display: inline-flex; }
+
+/* ===== 5. Sections ===== */
+section.block { padding-block: clamp(4rem, 10vw, 8rem); }
+.kicker { color: var(--accent); font-weight: 600; font-size: .9rem; letter-spacing: .06em; text-transform: uppercase; margin: 0 0 .8rem; }
+h2 { margin: 0 0 1rem; font: 600 clamp(1.8rem, 3.5vw, 3rem)/1.1 var(--font-display); letter-spacing: -.02em; max-width: 20ch; }
+.section-lead { color: var(--muted); max-width: 40rem; margin: 0 0 3rem; font-size: 1.15rem; }
+.grid { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.card { padding: 1.8rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); transition: transform .25s var(--ease), border-color .25s; }
+.card:hover { transform: translateY(-4px); border-color: rgb(255 255 255 / .28); }
+.card .icon { width: 2.6rem; height: 2.6rem; border-radius: 12px; display: grid; place-items: center; background: rgb(143 168 255 / .15); color: var(--accent); margin-bottom: 1.1rem; font-size: 1.3rem; }
+.card h3 { margin: 0 0 .5rem; font: 600 1.25rem var(--font-display); letter-spacing: -.01em; }
+.card p { margin: 0; color: var(--muted); }
+.stats { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.stat b { display: block; font: 600 clamp(2.4rem, 5vw, 4rem)/1 var(--font-display); letter-spacing: -.03em; }
+.stat span { color: var(--muted); }
+.closing { text-align: center; }
+.closing h2 { margin-inline: auto; max-width: 18ch; }
+.closing .cta-row { justify-content: center; opacity: 1; animation: none; }
+footer { padding-block: 2.5rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; }
+
+/* ===== 6. Reveal on scroll (content stays visible without JavaScript) ===== */
+.js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); transition-delay: calc(var(--d, 0) * 80ms); }
+.js .reveal.is-in { opacity: 1; transform: none; }
+
+/* ===== 7. Reduced motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .word, .lead, .cta-row { opacity: 1; transform: none; }
+  .js .reveal { opacity: 1; transform: none; }
+  .btn-primary::after, .scroll-cue { display: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap glass">
+    <a class="brand" href="#top">Lumen</a>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#proof">Proof</a></li>
+        <li><a href="#start">Get started</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-primary" href="#start">Start free</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <!-- To use real video, fill the three data attributes below with files in ./assets (see scripts/make_video_assets.sh).
+         Leave them empty to keep the animated gradient. The video is only requested for visitors who can play it. -->
+    <div class="hero-media" aria-hidden="true" data-video-mp4="" data-video-webm="" data-poster="">
+      <div class="aurora"><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="wrap hero-inner">
+      <span class="eyebrow glass">New &middot; Version 2 is here</span>
+      <h1 id="hero-title" data-words>Light that thinks with you</h1>
+      <p class="lead">One sentence that says who it is for and what changes for them. Keep it under 25 words.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#start">Start free</a>
+        <a class="btn btn-ghost glass" href="#features">See how it works</a>
+      </div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true"></div>
+    <button class="pause glass" type="button" aria-label="Pause background video">Pause video</button>
+  </section>
+
+  <section class="block" id="features">
+    <div class="wrap">
+      <p class="kicker reveal">Features</p>
+      <h2 class="reveal" style="--d:1">Three things it does better</h2>
+      <p class="section-lead reveal" style="--d:2">Short supporting paragraph. Say the outcome, not the technology.</p>
+      <div class="grid">
+        <article class="card reveal" style="--d:0"><div class="icon" aria-hidden="true">&#9889;</div><h3>Fast by default</h3><p>One sentence on the benefit and one concrete detail.</p></article>
+        <article class="card reveal" style="--d:1"><div class="icon" aria-hidden="true">&#9728;</div><h3>Clear at a glance</h3><p>One sentence on the benefit and one concrete detail.</p></article>
+        <article class="card reveal" style="--d:2"><div class="icon" aria-hidden="true">&#9881;</div><h3>Yours to shape</h3><p>One sentence on the benefit and one concrete detail.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="proof" style="padding-top:0">
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat reveal" style="--d:0"><b data-count="120" data-suffix="k">120k</b><span>Replace with a real number</span></div>
+        <div class="stat reveal" style="--d:1"><b data-count="98" data-suffix="%">98%</b><span>Replace with a real number</span></div>
+        <div class="stat reveal" style="--d:2"><b data-count="4" data-suffix=" min">4 min</b><span>Replace with a real number</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block closing" id="start">
+    <div class="wrap">
+      <h2 class="reveal">Ready when you are</h2>
+      <p class="section-lead reveal" style="--d:1;margin-inline:auto">Repeat the promise from the top in one line.</p>
+      <div class="cta-row reveal" style="--d:2">
+        <a class="btn btn-primary" href="#top">Start free</a>
+        <a class="btn btn-ghost glass" href="mailto:hello@example.com">Talk to us</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap"><span>&copy; 2026 Lumen</span><span>Replace this footer</span></div>
+</footer>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  root.classList.add("js");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const saveData = navigator.connection && navigator.connection.saveData;
+
+  // Split the headline into words for the staggered entrance (text stays intact for screen readers)
+  document.querySelectorAll("[data-words]").forEach(el => {
+    const text = el.textContent.trim();
+    el.setAttribute("aria-label", text);
+    el.innerHTML = text.split(/\s+/).map((w, i) => `<span class="word" aria-hidden="true" style="--i:${i}">${w}</span>`).join(" ");
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll(".reveal");
+  if (reduce || !("IntersectionObserver" in window)) {
+    reveals.forEach(el => el.classList.add("is-in"));
+  } else {
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
+    }), { threshold: .15, rootMargin: "0px 0px -8% 0px" });
+    reveals.forEach(el => io.observe(el));
+  }
+
+  // Count-up numbers (final value is already in the HTML, so no-JS shows the right number)
+  document.querySelectorAll("[data-count]").forEach(el => {
+    if (reduce) return;
+    const end = +el.dataset.count, suffix = el.dataset.suffix || "";
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const t0 = performance.now(), dur = 1200;
+      const tick = now => {
+        const p = Math.min(1, (now - t0) / dur), eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(end * eased) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }, { threshold: .6 });
+    io.observe(el);
+  });
+
+  // Hide the scroll cue after the first scroll
+  const cue = document.querySelector(".scroll-cue");
+  addEventListener("scroll", () => { if (cue) cue.style.opacity = scrollY > 40 ? "0" : "1"; }, { passive: true });
+
+  // Hero video: created only for visitors who can play it, paused when off screen, with a pause button.
+  // Reduced motion or data saver: the poster image is shown and no video is downloaded.
+  const media = document.querySelector(".hero-media");
+  const pauseBtn = document.querySelector(".pause");
+  if (media) {
+    const mp4 = media.dataset.videoMp4, webm = media.dataset.videoWebm, poster = media.dataset.poster;
+    if (poster || mp4 || webm) media.closest(".hero")?.classList.add("has-video");
+    if (poster) { media.style.background = `#0b0d12 url("${poster}") center / cover no-repeat`; media.querySelector(".aurora")?.remove(); }
+    if ((mp4 || webm) && !reduce && !saveData) {
+      const video = document.createElement("video");
+      Object.assign(video, { muted: true, loop: true, playsInline: true, preload: "metadata", tabIndex: -1 });
+      video.className = "hero-video";
+      video.setAttribute("muted", ""); video.setAttribute("playsinline", "");
+      video.width = 1920; video.height = 1080;
+      if (poster) video.poster = poster;
+      [[webm, "video/webm"], [mp4, "video/mp4"]].forEach(([src, type]) => {
+        if (!src) return;
+        const source = document.createElement("source");
+        source.src = src; source.type = type; video.appendChild(source);
+      });
+      media.appendChild(video);
+      let userPaused = false;
+      const start = () => video.play().then(() => video.classList.add("is-ready")).catch(() => {});
+      new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) { if (!userPaused) start(); } else { video.pause(); }
+      }, { threshold: .1 }).observe(video);
+      if (pauseBtn) {
+        pauseBtn.classList.add("is-visible");
+        pauseBtn.addEventListener("click", () => {
+          userPaused = !video.paused;
+          if (userPaused) { video.pause(); pauseBtn.textContent = "Play video"; pauseBtn.setAttribute("aria-label", "Play background video"); }
+          else { start(); pauseBtn.textContent = "Pause video"; pauseBtn.setAttribute("aria-label", "Pause background video"); }
+        });
+      }
+    }
+  }
+})();
+</script>
+</body>
+</html>

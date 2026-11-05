@@ -1,0 +1,63 @@
+# Real output of: python3 skills/build-flow-map/scripts/scan_stack.py ./my-app
+# Run on a small test project with deliberately planted problems (not a real app).
+
+# Stack scan: `./my-app`
+
+> Heuristic scan. Verify against the code; unknowns belong under 'Unverified'. Env var values are never read.
+
+## Stack
+- Languages: JavaScript (10 lines), Python (6 lines), TypeScript (2 lines)
+- Frameworks / tools: Express
+- Services / integrations: Database (see DATABASE_URL), PostgreSQL, Sentry, Stripe
+- Runtime requirements: not declared
+- Manifests: .env.example, package.json
+
+## Commands (from package scripts / Makefile)
+- `npm run start` : node src/server.js
+- `npm run test` : jest
+
+## Entry points
+- `app.py`
+- `src/server.js`
+
+## Routes
+- ROUTE `/ping` (app.py)
+- API `/orders/[id]` (app/orders/[id]/route.ts)
+- GET `/health` (src/server.js)
+- POST `/api/orders` (src/server.js)
+
+## Environment variables (names only)
+
+| Name | In .env.example | Used in |
+|---|:-:|---|
+| `DATABASE_URL` | yes | `src/lib/db.js` |
+| `PORT` | no | `src/server.js` |
+| `PY_ONLY_VAR` | no | `app.py` |
+| `SENTRY_DSN` | no | `src/server.js` |
+| `STRIPE_SECRET_KEY` | yes | `src/server.js` |
+| `UNUSED_VAR` | yes | - |
+
+## Docker / deploy / CI
+- Deploy configs: none found
+- No GitHub Actions workflows found
+
+## Runtime diagram (draft)
+```mermaid
+flowchart LR
+  client[Browser / Client] --> app[App]
+  app --> Database__see_DATABASE_URL_[("Database (see DATABASE_URL)")]
+  app --> PostgreSQL[("PostgreSQL")]
+  app --> Sentry["Sentry"]
+  app --> Stripe["Stripe"]
+```
+
+## Internal module graph (imports between folders)
+```mermaid
+flowchart LR
+  src["src"] -->|1| src_lib["src/lib"]
+  src["src"] -->|1| src_api["src/api"]
+  src_api["src/api"] -->|1| src_lib["src/lib"]
+```
+
+## Top-level folders
+`app/`, `src/`
