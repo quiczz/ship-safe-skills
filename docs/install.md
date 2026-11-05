@@ -73,5 +73,6 @@ Build the zips yourself: `python3 tools/build_release.py` (output in `dist/`).
 
 - **Skills do not appear:** restart Claude Code; check the folder is `~/.claude/skills/<name>/SKILL.md` (one level, not nested inside another folder).
 - **Plugin marketplace add fails:** confirm the repo is public and the name is exact; `/plugin marketplace add https://github.com/quiczz/ship-safe-skills.git` also works.
+- **Windows, autopilot hooks do nothing:** the plugin's hooks call `python3`, which Windows often lacks (or maps to a Microsoft Store stub). Use `py install.py autopilot on` instead, which writes the path of the Python you ran it with into your settings. If you do that, skip the plugin's hooks (or run `py install.py autopilot off` to undo).
 - **Both plugin and autopilot installed:** run `python3 install.py autopilot off`.
 - **Claude.ai rejects the zip:** use a per-skill zip; the skill folder must be at the zip root.

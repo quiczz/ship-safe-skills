@@ -202,7 +202,9 @@ def autopilot_on(project: bool) -> int:
     hooks = settings.setdefault("hooks", {})
     for event, matcher, arg, timeout in HOOK_EVENTS:
         groups = [g for g in hooks.get(event, []) if not _is_ours(g)]
-        group = {"hooks": [{"type": "command", "command": f'python3 "{script}" {arg}', "timeout": timeout}]}
+        # On Windows "python3" is usually missing or a Microsoft Store stub, so use the interpreter running this installer.
+        py = f'"{sys.executable}"' if sys.platform == "win32" else "python3"
+        group = {"hooks": [{"type": "command", "command": f'{py} "{script}" {arg}', "timeout": timeout}]}
         if matcher:
             group = {"matcher": matcher, **group}
         groups.append(group)

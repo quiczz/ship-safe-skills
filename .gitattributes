@@ -1,0 +1,6 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Scripts must stay LF so they run on Linux/macOS even when cloned on Windows
+*.sh text eol=lf
+*.py text eol=lf
